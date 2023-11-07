@@ -38,6 +38,9 @@ func New(conf *Config, logger *zap.Logger) *Writer {
 		cancel: cancel,
 	}
 	sw.client.AuthToken = conf.SignalFxAccessToken
+	if conf.HeaderDebugID != "" {
+		sw.client.AdditionalHeaders = map[string]string{"X-Debug-Id": conf.HeaderDebugID}
+	}
 	sw.client.Client.Timeout = conf.HTTPTimeout
 	sw.client.Client.Transport = &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
@@ -51,7 +54,12 @@ func New(conf *Config, logger *zap.Logger) *Writer {
 		IdleConnTimeout:     30 * time.Second,
 		TLSHandshakeTimeout: 10 * time.Second,
 	}
-	sw.client.DatapointEndpoint = fmt.Sprintf("https://ingest.%s.signalfx.com/v2/datapoint", conf.Realm)
+	if len(conf.Realm) > 3 {
+		sw.client.DatapointEndpoint = conf.Realm
+	} else {
+		sw.client.DatapointEndpoint = fmt.Sprintf("https://ingest.%s.signalfx.com/v2/datapoint", conf.Realm)
+	}
+
 	sw.datapointWriter = &sfxwriter.DatapointWriter{
 		SendFunc: sw.sendDatapoints,
 		OverwriteFunc: func() {

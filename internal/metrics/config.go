@@ -14,6 +14,7 @@ type Config struct {
 	BatchSizeToWriter   int64
 	Realm               string
 	NumMetrics          int
+	HeaderDebugID       string
 }
 
 func (c *Config) Flags(fs *pflag.FlagSet) {
@@ -25,4 +26,5 @@ func (c *Config) Flags(fs *pflag.FlagSet) {
 	fs.StringVar(&c.SignalFxAccessToken, "access-token", "", "SignalFX Ingest Access Token")
 	fs.StringVar(&c.Realm, "realm", "us0", "Realm your Org belongs to")
 	fs.IntVar(&c.NumMetrics, "metrics", 1, "Number of metrics to generate in each worker (ignored if duration is provided)")
+	fs.StringVar(&c.HeaderDebugID, "header-debug-id", "", "ID value to set the header X-Debug-Id value")
 }
